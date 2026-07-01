@@ -1,9 +1,273 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document 1</title>
-  </head>
-  <body></body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ModernTech HR | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div id="dashboardApp" class="container py-4">
+    <header class="hero-strip p-4 mb-4 fade-up">
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div>
+          <h1 class="brand-title h3 mb-1">ModernTech HR Dashboard</h1>
+          <p class="mb-0">Welcome, {{ currentUser }}. Manage employees from one place.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <a class="btn btn-light btn-sm" href="Attendance.html">Attendance</a>
+          <a class="btn btn-light btn-sm" href="payroll.html">Payroll</a>
+          <button class="btn btn-warning btn-sm" @click="resetAllData">Reset Dummy Data</button>
+          <button class="btn btn-outline-light btn-sm" @click="logout">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="row g-3 mb-4">
+      <div class="col-12 col-md-4 fade-up delay-1">
+        <article class="card card-kpi h-100">
+          <div class="card-body">
+            <p class="text-secondary mb-2">Total Employees</p>
+            <h2 class="h3 mb-0">{{ employees.length }}</h2>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-4 fade-up delay-2">
+        <article class="card card-kpi h-100">
+          <div class="card-body">
+            <p class="text-secondary mb-2">Departments</p>
+            <h2 class="h3 mb-0">{{ uniqueDepartments }}</h2>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-4 fade-up delay-3">
+        <article class="card card-kpi h-100">
+          <div class="card-body">
+            <p class="text-secondary mb-2">Avg. Salary</p>
+            <h2 class="h3 mb-0">R {{ averageSalary.toLocaleString() }}</h2>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="app-shell p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0 brand-title">Employee Data Management</h2>
+      </div>
+
+      <form class="row g-3" @submit.prevent="saveEmployee" novalidate>
+        <div class="col-12 col-md-3">
+          <label class="form-label">First Name</label>
+          <input class="form-control" v-model.trim="employeeForm.firstName" required>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label">Last Name</label>
+          <input class="form-control" v-model.trim="employeeForm.lastName" required>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label">Department</label>
+          <select class="form-select" v-model="employeeForm.department" required>
+            <option value="">Select</option>
+            <option>Software Development</option>
+            <option>Quality Assurance</option>
+            <option>Customer Support</option>
+            <option>Sales</option>
+            <option>Marketing</option>
+            <option>Human Resources</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label">Role</label>
+          <input class="form-control" v-model.trim="employeeForm.role" required>
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Email</label>
+          <input class="form-control" type="email" v-model.trim="employeeForm.email" required>
+        </div>
+        <div class="col-12 col-md-2">
+          <label class="form-label">Phone</label>
+          <input class="form-control" v-model.trim="employeeForm.phone" required>
+        </div>
+        <div class="col-12 col-md-2">
+          <label class="form-label">Hire Date</label>
+          <input class="form-control" type="date" v-model="employeeForm.hireDate" required>
+        </div>
+        <div class="col-12 col-md-2">
+          <label class="form-label">Salary (R)</label>
+          <input class="form-control" type="number" min="0" step="500" v-model.number="employeeForm.salary" required>
+        </div>
+        <div class="col-12 col-md-2">
+          <label class="form-label">Status</label>
+          <select class="form-select" v-model="employeeForm.status" required>
+            <option>Active</option>
+            <option>On Leave</option>
+            <option>Inactive</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-brand" type="submit">{{ employeeForm.id ? "Update Employee" : "Add Employee" }}</button>
+          <button class="btn btn-outline-secondary" type="button" @click="clearForm">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="app-shell p-4">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Role</th>
+              <th>Email</th>
+              <th>Salary</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="employee in employees" :key="employee.id">
+              <td>{{ employee.firstName }} {{ employee.lastName }}</td>
+              <td>{{ employee.department }}</td>
+              <td>{{ employee.role }}</td>
+              <td>{{ employee.email }}</td>
+              <td>R {{ Number(employee.salary).toLocaleString() }}</td>
+              <td><span class="badge text-bg-light">{{ employee.status }}</span></td>
+              <td class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary" @click="editEmployee(employee)">Edit</button>
+                <button class="btn btn-sm btn-outline-danger" @click="removeEmployee(employee.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="assets/js/hr-data.js"></script>
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          currentUser: "HR Staff",
+          employees: [],
+          employeeForm: {
+            id: null,
+            firstName: "",
+            lastName: "",
+            department: "",
+            role: "",
+            email: "",
+            phone: "",
+            hireDate: "",
+            salary: 0,
+            status: "Active"
+          }
+        };
+      },
+      computed: {
+        uniqueDepartments() {
+          return new Set(this.employees.map(function (employee) { return employee.department; })).size;
+        },
+        averageSalary() {
+          if (!this.employees.length) {
+            return 0;
+          }
+
+          const total = this.employees.reduce(function (sum, employee) {
+            return sum + Number(employee.salary || 0);
+          }, 0);
+          return Math.round(total / this.employees.length);
+        }
+      },
+      mounted() {
+        const session = localStorage.getItem("moderntech-hr-session");
+        if (!session) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        const sessionData = JSON.parse(session);
+        this.currentUser = sessionData.username;
+        this.loadData();
+      },
+      methods: {
+        loadData() {
+          const state = HRData.getData();
+          this.employees = state.employees;
+        },
+        saveState() {
+          const state = HRData.getData();
+          state.employees = this.employees;
+          HRData.saveData(state);
+        },
+        saveEmployee() {
+          if (!this.employeeForm.firstName || !this.employeeForm.lastName || !this.employeeForm.department || !this.employeeForm.role) {
+            alert("Please complete all required fields.");
+            return;
+          }
+
+          if (this.employeeForm.id) {
+            const target = this.employees.find((employee) => employee.id === this.employeeForm.id);
+            if (target) {
+              Object.assign(target, this.employeeForm);
+            }
+          } else {
+            this.employees.push({
+              ...this.employeeForm,
+              id: HRData.nextId(this.employees)
+            });
+          }
+
+          this.saveState();
+          this.clearForm();
+        },
+        editEmployee(employee) {
+          this.employeeForm = { ...employee };
+        },
+        removeEmployee(id) {
+          if (!confirm("Delete this employee record?")) {
+            return;
+          }
+
+          this.employees = this.employees.filter((employee) => employee.id !== id);
+          this.saveState();
+        },
+        clearForm() {
+          this.employeeForm = {
+            id: null,
+            firstName: "",
+            lastName: "",
+            department: "",
+            role: "",
+            email: "",
+            phone: "",
+            hireDate: "",
+            salary: 0,
+            status: "Active"
+          };
+        },
+        logout() {
+          localStorage.removeItem("moderntech-hr-session");
+          window.location.href = "login.html";
+        },
+        resetAllData() {
+          if (!confirm("Reset all dummy data to default values?")) {
+            return;
+          }
+
+          HRData.resetData();
+          this.loadData();
+        }
+      }
+    }).mount("#dashboardApp");
+  </script>
+</body>
 </html>

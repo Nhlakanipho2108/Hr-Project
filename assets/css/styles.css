@@ -1,0 +1,91 @@
+:root {
+  --brand-navy: #0f2a43;
+  --brand-cyan: #12b5cb;
+  --brand-gold: #f6b93b;
+  --paper: #f4f7fb;
+  --ink: #132238;
+  --muted: #5f6f82;
+}
+
+body {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top right, #e5fbff, #f4f7fb 45%, #eef3fb 100%);
+  min-height: 100vh;
+}
+
+.app-shell {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #dde6f2;
+  border-radius: 1rem;
+  box-shadow: 0 16px 36px rgba(13, 38, 59, 0.08);
+}
+
+.brand-title {
+  font-family: "Space Grotesk", "Poppins", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.hero-strip {
+  background: linear-gradient(120deg, var(--brand-navy), #1b4d72 60%, var(--brand-cyan));
+  border-radius: 1rem;
+  color: #fff;
+}
+
+.badge-soft {
+  color: var(--brand-navy);
+  background: #dff8fd;
+}
+
+.card-kpi {
+  border: 0;
+  border-left: 6px solid var(--brand-cyan);
+  border-radius: 0.9rem;
+  box-shadow: 0 8px 20px rgba(17, 52, 79, 0.08);
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--brand-navy);
+}
+
+.btn-brand {
+  background: var(--brand-navy);
+  color: #fff;
+}
+
+.btn-brand:hover {
+  background: #0b2237;
+  color: #fff;
+}
+
+.table thead th {
+  background: #f0f5fb;
+}
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.45s ease forwards;
+}
+
+.fade-up.delay-1 { animation-delay: 0.1s; }
+.fade-up.delay-2 { animation-delay: 0.2s; }
+.fade-up.delay-3 { animation-delay: 0.3s; }
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-strip {
+    border-radius: 0.75rem;
+  }
+
+  .app-shell {
+    border-radius: 0.75rem;
+  }
+}
